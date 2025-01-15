@@ -46,7 +46,8 @@ fn message_box(params: MessageBoxParams) -> Result<bool> {
     use std::ptr::null_mut;
     use winapi::shared::windef::HWND;
     use winapi::um::winuser::{
-        MessageBoxW, IDYES, MB_ICONERROR, MB_ICONINFORMATION, MB_ICONWARNING, MB_OK, MB_YESNO,
+        MessageBoxW, IDYES, MB_DEFAULT_DESKTOP_ONLY, MB_ICONERROR, MB_ICONINFORMATION,
+        MB_ICONWARNING, MB_OK, MB_YESNO,
     };
 
     let owner = match params.owner {
@@ -70,8 +71,10 @@ fn message_box(params: MessageBoxParams) -> Result<bool> {
         MessageType::Error => MB_ICONERROR,
     } | if params.ask { MB_YESNO } else { MB_OK };
 
+    let flags = MB_DEFAULT_DESKTOP_ONLY;
+
     let ret = super::with_visual_styles(|| unsafe {
-        MessageBoxW(owner, text.as_ptr(), caption.as_ptr(), u_type)
+        MessageBoxW(owner, text.as_ptr(), caption.as_ptr(), u_type | flags)
     });
 
     match ret {
